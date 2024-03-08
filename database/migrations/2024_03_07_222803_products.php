@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-      /*  Schema::create('products', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->decimal('price', 8, 2);
@@ -36,7 +36,7 @@ return new class extends Migration
 
         foreach ($products as $product) {
             DB::table('products')->insert($product);
-        }*/
+        }
     }
 
     /**

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Sale;
 use App\Models\Product;
 use App\Models\SaleProduct;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 
 
 class SaleController extends Controller
@@ -23,8 +25,6 @@ class SaleController extends Controller
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.price' => 'required|numeric|min:0',
         ]);
-        // Print para verificar se a validação passou corretamente
-        echo "Dados validados com sucesso!<br>"; die();
 
         try {
             // Inicie uma transação de banco de dados
@@ -91,6 +91,35 @@ class SaleController extends Controller
         return response()->json($formattedSales);
     }
 
+    //Listar venda disponivel
+    public function getSale($id)
+    {
+        try {
+            // Tente encontrar a venda pelo ID
+            $sale = Sale::with('saleProducts.product')->findOrFail($id);
+    
+            // Formate os detalhes da venda
+            $formattedSale = [
+                'sales_id' => $sale->sales_id,
+                'amount' => $sale->total_amount,
+                'products' => $sale->saleProducts->map(function ($saleProduct) {
+                    return [
+                        'product_id' => $saleProduct->product_id,
+                        'nome' => $saleProduct->product->name,
+                        'price' => $saleProduct->price,
+                        'amount' => $saleProduct->quantity
+                    ];
+                })
+            ];
+    
+            // Retorne os detalhes da venda formatados em formato JSON
+            return response()->json($formattedSale);
+        } catch (ModelNotFoundException $e) {
+            // Se a venda não for encontrada, retorne uma resposta indicando isso
+            return response()->json(['message' => 'Venda não encontrada'], 404);
+        }
+    }
+
     // Método para consultar uma venda específica
     public function showSale($id)
     {
@@ -101,9 +130,17 @@ class SaleController extends Controller
     // Método para cancelar uma venda
     public function cancelSale($id)
     {
+        // Encontre a venda pelo ID
         $sale = Sale::findOrFail($id);
+
+        // Encontre e exclua os produtos associados a esta venda na tabela sale_products
+        $sale->saleProducts()->delete();
+
+        // Agora você pode excluir a venda
         $sale->delete();
-        return response()->json(['message' => 'Venda cancelada com sucesso']);
+
+        // Retorne uma resposta JSON informando que a venda e seus produtos foram excluídos com sucesso
+        return response()->json(['message' => 'Venda e produtos associados excluídos com sucesso']);
     }
 
     // Método para cadastrar novos produtos a uma venda existente

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up()
     {
-        /*Schema::create('sale_products', function (Blueprint $table) {
+        Schema::create('sale_products', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sale_id');
             $table->unsignedBigInteger('product_id');
@@ -24,7 +24,7 @@ return new class extends Migration
 
             // Chave estrangeira para a tabela products
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-        });*/
+        });
     }
 
 

@@ -12,6 +12,7 @@
     // Cadastrar nova venda
     Route::post('/sales', [SaleController::class, 'createSale']);
 
+
     // Consultar vendas realizadas
     Route::get('/sales', [SaleController::class, 'listSales']);
 
@@ -30,6 +31,9 @@
 
     // Listar produtos disponíveis
     Route::get('/products', [ProductController::class, 'index']);
+
+    // Listar venda disponíveis
+    Route::get('/sales/{id}', [SaleController::class, 'getSale']);
 
 
     // Cadastrar novo produto
