@@ -16,12 +16,22 @@ http://localhost:8000/api/
 ```bash
 GET /products
 ```
+
+```bash
+GET http://localhost:8000/api/products
+```
+
 Este endpoint retorna uma lista de todos os produtos disponíveis na loja.
 
 #### Cadastrar Nova Venda
 ```bash
 POST /sales
 ```
+
+```bash
+POST http://localhost:8000/api/sales
+```
+
 Este endpoint permite cadastrar uma nova venda na loja, juntamente com os produtos vendidos.
 ##### Body
 
@@ -82,6 +92,11 @@ Este endpoint permite cadastrar uma nova venda na loja, juntamente com os produt
 ```bash
 GET /sales
 ```
+
+```bash
+GET http://localhost:8000/api/sales
+```
+
 Este endpoint retorna uma lista de todas as vendas realizadas na loja, juntamente com os detalhes dos produtos vendidos em cada venda.
 
 #### Consultar uma Venda Específica
@@ -89,10 +104,19 @@ Este endpoint retorna uma lista de todas as vendas realizadas na loja, juntament
 GET /sales/{id}
 ```
 
+```bash
+GET http://localhost:8000/api/sales/1
+```
+
 #### Cancelar uma Venda
 ```bash
 DELETE /sales/{id}
 ```
+
+```bash
+DELETE http://localhost:8000/api/sales/1
+```
+
 Este endpoint permite cancelar uma venda e remover os produtos associados a ela da loja.
 
 #### Autenticação e Autorização:
@@ -102,53 +126,6 @@ A API é de acesso público e não requer autenticação para realizar as opera�
 ### Exemplos de Uso:
 Aqui estão alguns exemplos de como usar a API em diferentes cenários:
 
-Listar Produtos Disponíveis:
-
-```bash
-GET http://localhost:8000/api/products
-```
-
-Cadastrar Nova Venda:
-
-```bash
-POST http://localhost:8000/api/sales
-```
-
-```bash
-Body:
-{
-  "sales_id": "202301011",
-  "total_amount": 8200,
-  "products": [
-    {
-      "product_id": 1,
-      "quantity": 1,
-      "price": 1800
-    },
-    {
-      "product_id": 2,
-      "quantity": 2,
-      "price": 3200
-    }
-  ]
-}
-```
-
-Consultar Vendas Realizadas:
-
-```bash
-GET http://localhost:8000/api/sales
-```
-Consultar uma Venda Específica:
-
-```bash
-GET http://localhost:8000/api/sales/1
-```
-Cancelar uma Venda:
-
-```bash
-DELETE http://localhost:8000/api/sales/1
-```
 
 # Instalação
 Siga estas etapas para instalar e configurar a API de Vendas:
