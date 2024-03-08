@@ -37,7 +37,7 @@ class SaleController extends Controller
         // Criação da venda
         $sale = Sale::create([
             'id' => $request->input('id'), // Autocomplete
-            'sales_id' => $request->input('sales_id'),
+            'sales_id' => 0,
             'total_amount' => $totalAmount
         ]);
 
@@ -56,8 +56,7 @@ class SaleController extends Controller
 
         // Retorno da resposta JSON
         $saleDetails = [
-            'id' => $sale->id,
-            'id_sales' => $sale->id_sales,
+            'id_sales' => $sale->id,
             'total_amount' => $sale->total_amount,
             'products' => $request->input('products')
         ];

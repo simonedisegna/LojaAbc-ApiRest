@@ -23,7 +23,50 @@ Este endpoint retorna uma lista de todos os produtos disponíveis na loja.
 POST /sales
 ```
 Este endpoint permite cadastrar uma nova venda na loja, juntamente com os produtos vendidos.
+##### Body
 
+```json
+{
+  "products": [
+    {
+      "product_id": 1,
+      "nome": "Celular 1",
+      "price": 1800,
+      "amount": 1
+    },
+    {
+      "product_id": 2,
+      "nome": "Celular 2",
+      "price": 3200,
+      "amount": 2
+    }
+  ]
+}
+```
+#### Resposta
+```json
+{
+    "message": "Venda cadastrada com sucesso",
+    "data": {
+        "id_sales": 16,
+        "total_amount": 8200,
+        "products": [
+            {
+                "product_id": 1,
+                "nome": "Celular 1",
+                "price": 1800,
+                "amount": 1
+            },
+            {
+                "product_id": 2,
+                "nome": "Celular 2",
+                "price": 3200,
+                "amount": 2
+            }
+        ]
+    }
+}
+```
 **Parâmetros da Requisição:**
 
 ```bash
@@ -106,3 +149,39 @@ Cancelar uma Venda:
 ```bash
 DELETE http://localhost:8000/api/sales/1
 ```
+
+# Instalação
+Siga estas etapas para instalar e configurar a API de Vendas:
+
+1. Clone o repositório do projeto:
+
+```bash
+git clone https://github.com/seu-usuario/api-vendas.git
+```
+
+2. Navegue até o diretório do projeto:
+```bash
+cd api-vendas
+```
+3. Instale as dependências do Composer:
+```bash
+composer install
+```
+4. Copie o arquivo de ambiente de exemplo e configure-o conforme necessário:
+```bash
+cp .env.example .env
+```
+5. Gere uma nova chave de aplicativo:
+```bash
+php artisan key:generate
+```
+6. Configure seu banco de dados no arquivo .env.
+7. Execute as migrações do banco de dados para criar as tabelas necessárias:
+```bash
+php artisan migrate
+```
+8. Inicie o servidor de desenvolvimento:
+```bash
+php artisan serve
+```
+A API de Vendas estará disponível em http://localhost:8000.
