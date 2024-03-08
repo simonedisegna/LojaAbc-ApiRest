@@ -9,7 +9,7 @@ class ProductSeeder extends Seeder
 {
     public function run()
     {
-        Product::create([
+     /*   Product::create([
             'name' => 'Celular 1',
             'price' => 1800,
             'description' => 'Lorenzo Ipsulum'
@@ -25,7 +25,7 @@ class ProductSeeder extends Seeder
             'name' => 'Celular 3',
             'price' => 9800,
             'description' => 'Lorem ipsum dolor sit amet'
-        ]);
+        ]);*/
     }
 }
 ?>

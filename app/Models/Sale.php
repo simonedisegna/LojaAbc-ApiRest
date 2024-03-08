@@ -7,15 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
-    use HasFactory;
+    protected $fillable = ['sales_id', 'total_amount'];
 
-    protected $fillable = [
-        'sales_id',
-        'amount',
-    ];
-
-    public function items()
+    public function saleProducts()
     {
-        return $this->hasMany(SaleItem::class);
+        return $this->hasMany(SaleProduct::class);
     }
+
 }
