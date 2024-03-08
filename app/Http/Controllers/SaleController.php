@@ -8,62 +8,81 @@ use App\Models\Sale;
 use App\Models\Product;
 use App\Models\SaleProduct;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\Rule;
+use App\Http\Controllers\ValidationException;
 
 
 
 class SaleController extends Controller
 {
+    public function index(){
+        return Sale::all();
+    }
+
     // Método para cadastrar uma nova venda
-    public function createSale(Request $request)
-    {
-        // Valide os dados recebidos do request
+    public function createSale(Request $request){
+    try {
+        // Validação dos dados
         $request->validate([
-            'sales_id' => 'required|unique:sales',
+            'id' => 'required|unique:sales',
+            'id_sales' => 'required', // Ajuste conforme necessário, dependendo do relacionamento
             'total_amount' => 'required|numeric|min:0',
             'products' => 'required|array',
-            'products.*.product_id' => 'required|exists:products,id',
-            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.product_id' => [
+                'required',
+                Rule::exists('products', 'id')
+            ],
+            'products.*.amount' => 'required|integer|min:1',
             'products.*.price' => 'required|numeric|min:0',
         ]);
 
-        try {
-            // Inicie uma transação de banco de dados
-            DB::beginTransaction();
-
-            // Crie a venda
-            $sale = Sale::create([
-                'sales_id' => $request->input('sales_id'),
-                'total_amount' => $request->input('total_amount')
-            ]);
-
-            // Registre os produtos vendidos
-            foreach ($request->input('products') as $productData) {
-                SaleProduct::create([
-                    'sale_id' => $sale->id,
-                    'product_id' => $productData['product_id'],
-                    'quantity' => $productData['quantity'],
-                    'price' => $productData['price']
-                ]);
-            }
-
-            // Commit da transação
-            DB::commit();
-
-            // Retorne uma resposta JSON com os detalhes da venda e dos produtos vendidos
-            $saleDetails = [
-                'sales_id' => $sale->id, // Corrigido para usar o ID da venda recém-criada
-                'total_amount' => $sale->total_amount,
-                'products' => $request->input('products')
-            ];
-            
-            // Retorne uma resposta JSON indicando que a venda foi cadastrada com sucesso
-            return response()->json(['message' => 'Venda cadastrada com sucesso', 'data' => $saleDetails]);
-        } catch (\Exception $e) {
-            // Se ocorrer algum erro, reverta a transação e retorne uma resposta de erro
-            DB::rollBack();
-            return response()->json(['error' => 'Erro ao cadastrar a venda: ' . $e->getMessage()], 500);
+        // Cálculo do total_amount
+        $totalAmount = 0;
+        foreach ($request->input('products') as $productData) {
+            $totalAmount += $productData['amount'] * $productData['price'];
         }
+
+        // Início da transação
+        DB::beginTransaction();
+
+        // Criação da venda
+        $sale = Sale::create([
+            'id' => $request->input('id'), // Autocomplete
+            'id_sales' => $request->input('id_sales'),
+            'total_amount' => $totalAmount
+        ]);
+
+        // Registro dos produtos vendidos
+        foreach ($request->input('products') as $productData) {
+            SaleProduct::create([
+                'sale_id' => $sale->id,
+                'product_id' => $productData['product_id'],
+                'quantity' => $productData['amount'],
+                'price' => $productData['price']
+            ]);
+        }
+
+        // Commit da transação
+        DB::commit();
+
+        // Retorno da resposta JSON
+        $saleDetails = [
+            'id' => $sale->id,
+            'id_sales' => $sale->id_sales,
+            'total_amount' => $sale->total_amount,
+            'products' => $request->input('products')
+        ];
+
+        return response()->json(['message' => 'Venda cadastrada com sucesso', 'data' => $saleDetails]);
+    } catch (\Exception $e) {
+        if ($e instanceof \Illuminate\Validation\ValidationException) {
+            return response()->json(['errors' => $e->errors()], 422);
+        }
+        // Reversão da transação e retorno da mensagem de erro
+        DB::rollBack();
+        return response()->json(['error' => 'Erro ao cadastrar a venda: ' . $e->getMessage()], 500);
     }
+}
 
     // Método para listar vendas realizadas
     public function listSales()
@@ -130,17 +149,22 @@ class SaleController extends Controller
     // Método para cancelar uma venda
     public function cancelSale($id)
     {
-        // Encontre a venda pelo ID
-        $sale = Sale::findOrFail($id);
+        try {
+            // Encontre a venda pelo ID
+            $sale = Sale::findOrFail($id);
 
-        // Encontre e exclua os produtos associados a esta venda na tabela sale_products
-        $sale->saleProducts()->delete();
+            // Encontre e exclua os produtos associados a esta venda na tabela sale_products
+            $sale->saleProducts()->delete();
 
-        // Agora você pode excluir a venda
-        $sale->delete();
+            // Agora você pode excluir a venda
+            $sale->delete();
 
-        // Retorne uma resposta JSON informando que a venda e seus produtos foram excluídos com sucesso
-        return response()->json(['message' => 'Venda e produtos associados excluídos com sucesso']);
+            // Retorne uma resposta JSON informando que a venda e seus produtos foram excluídos com sucesso
+            return response()->json(['message' => 'Venda e produtos associados excluídos com sucesso']);
+        } catch (ModelNotFoundException $e) {
+            // Se a venda não for encontrada, retorne uma resposta indicando isso
+            return response()->json(['message' => 'Venda não encontrada'], 404);
+        }
     }
 
     // Método para cadastrar novos produtos a uma venda existente
