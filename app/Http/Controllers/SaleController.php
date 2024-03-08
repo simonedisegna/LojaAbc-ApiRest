@@ -21,21 +21,10 @@ class SaleController extends Controller
 
     // Método para cadastrar uma nova venda
     public function createSale(Request $request){
+       
+        
     try {
-        // Validação dos dados
-        $request->validate([
-            'id' => 'required|unique:sales',
-            'id_sales' => 'required', // Ajuste conforme necessário, dependendo do relacionamento
-            'total_amount' => 'required|numeric|min:0',
-            'products' => 'required|array',
-            'products.*.product_id' => [
-                'required',
-                Rule::exists('products', 'id')
-            ],
-            'products.*.amount' => 'required|integer|min:1',
-            'products.*.price' => 'required|numeric|min:0',
-        ]);
-
+        
         // Cálculo do total_amount
         $totalAmount = 0;
         foreach ($request->input('products') as $productData) {
@@ -48,7 +37,7 @@ class SaleController extends Controller
         // Criação da venda
         $sale = Sale::create([
             'id' => $request->input('id'), // Autocomplete
-            'id_sales' => $request->input('id_sales'),
+            'sales_id' => $request->input('sales_id'),
             'total_amount' => $totalAmount
         ]);
 
